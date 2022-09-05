@@ -17,8 +17,9 @@ line_sensor = ColorSensor(Port.S5)
 # Initialize the drive base.
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
 
-# Configure the path measurements.
-PATH_RANGE = 20
+# Configure the path value measurements.
+PATH_RANGE = 20 # Sensor Reflection Value
+PATH_END_RANGE = 33 # Sensor Reflection Value
 
 # Calculate the threshold
 BLACK = 9
@@ -36,11 +37,11 @@ DRIVE_SPEED = 20
 # steers at 10*1.2 = 12 degrees per second.
 PROPORTIONAL_GAIN = 1.2
 
-
 # Endless loop
 while True:
+
     # Check if we are on the path.
-    if line_sensor.reflection() > PATH_RANGE - 2 & line_sensor.reflection() < PATH_RANGE + 2:
+    if line_sensor.reflection() > PATH_RANGE - 2 and line_sensor.reflection() < PATH_RANGE + 2:
         # Calculate the deviation from the threshold
         deviation = line_sensor.reflection() - threshold
 
@@ -49,3 +50,7 @@ while True:
 
         # Set the drive base speed and turn rate.
         robot.drive(DRIVE_SPEED, turn_rate)
+
+    elif line_sensor.reflection() > PATH_END_RANGE - 2 and line_sensor.reflection() < PATH_END_RANGE + 2:
+        # call protocol method
+        print('end of path reached')

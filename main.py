@@ -22,7 +22,8 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
 
 # Configure the path value measurements.
 PATH_RANGE = 30 # Sensor Reflection Value
-PATH_END_RANGE = 18 # Sensor Reflection Value
+WALL_RANGE = 18 # Sensor Reflection Value
+OFF_RANGE = 54 # Sensor Reflection Value
 
 # Calculate the threshold
 BLACK = 28
@@ -32,34 +33,24 @@ threshold = (BLACK + WHITE) / 2
 # Set the drive speed at 20 millimeters per second.
 DRIVE_SPEED = 30
 
-# Set the gain of the proportional line controller. This means that for every
-# percentage point of light deviating from the threshold, we set the turn
-# rate of the drivebase to 1.2 degrees per second.
-
-# For example, if the light value deviates from the threshold by 10, the robot
-# steers at 10*1.2 = 12 degrees per second.
-PROPORTIONAL_GAIN = 1.2
-
 
 class LineFollower:
-    robot, pv, wv, ov, ta, lr = None
-    def __init__(self, robot: DriveBase, pv: int, wv: int, ov: int, ta: int):
-        #pv path value
-        #wv wall value
-        #off value
-        #turn angle
+    robot, pv, wv, ov, ta, lr, ds = None
+    def __init__(self, robot: DriveBase, pv: int, wv: int, ov: int, ta: int, ds: int):
 
         self.robot = robot
-        self.pv = pv
-        self.wv = wv
-        self.ov = ov
-        self.ta = ta
+        self.pv = pv # path value
+        self.wv = wv # wall value
+        self.ov = ov # off value
+        self.ta = ta # turn angle
+        self.ds = ds # drive speed
+        self.shut_down = False # shut down signal
 
     def isOnPath(self) -> bool:
-        return PATH_RANGE + 15 > line_sensor.reflection() > PATH_RANGE - 8
+        return self.pv + 15 > line_sensor.reflection() > self.pv - 8
 
     def isOnWall(self) -> bool:
-        return PATH_END_RANGE + 4 > line_sensor.reflection() > PATH_END_RANGE - 3
+        return self.wv + 4 > line_sensor.reflection() > self.wv - 3
 
     def isOffPath(self) -> bool:
         return not self.isOnPath() and not self.isOnWall()
@@ -84,3 +75,52 @@ class LineFollower:
             if d < 0:
                 sm+= 1
             d*=1
+
+    def adjust_lane(self):
+        print('Adjusting to lane...')
+    
+
+    def run(self):
+
+        # Configure robot settings
+        robot.speed = self.speed
+
+
+        # Deal with PID algorithm values - https://thecodingfun.com/2020/06/16/lego-mindstorms-ev3-pid-line-follower-code-by-using-micropython-2-0/
+        Kp = 4.2 # Represents Proportional
+        Ki = 0.008 # Represents Integral, which calculates the historically accumulated error
+        Kd = 0.01 # Represents Derivative, which forecasts the future error based on the past error
+        last_error = 0
+        integral = 0
+        derivative = 0
+
+        # PID Algorithm combines three parts and assing factors Kp, Ki and Kd
+        # to each of them and calculates the value of Turn, which will be added/subtracted
+
+        # Main class loop
+        while not self.shut_down:
+            
+            if self.isOffPath():
+                self.autocorrect_Path()
+            # Deal with wall cps
+            elif self.isOnWall():
+
+                robot.stop()
+                # start challenge protocols
+            else:
+                
+                error = line_sensor().reflection() - threshold
+                integral = integral + error
+                derivative = error - last_error
+
+                turn_rate = Kp * error + Ki * integral + Kd * derivative
+                left_motor(self.ds + turn_rate)
+                right_motor(self.ds - turn_rate)
+
+                wait(10)
+            
+            
+
+
+
+

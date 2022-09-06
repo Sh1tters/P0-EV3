@@ -12,7 +12,7 @@ left_motor = Motor(Port.A, Direction.CLOCKWISE)
 right_motor = Motor(Port.D, Direction.CLOCKWISE)
 
 # Initialize the color sensor.
-line_sensor = ColorSensor(Port.S5)
+line_sensor = ColorSensor(Port.S3)
 
 # Initialize the drive base.
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
@@ -27,7 +27,7 @@ WHITE = 85
 threshold = (BLACK + WHITE) / 2
 
 # Set the drive speed at 20 millimeters per second.
-DRIVE_SPEED = 20
+DRIVE_SPEED = 50
 
 # Set the gain of the proportional line controller. This means that for every
 # percentage point of light deviating from the threshold, we set the turn

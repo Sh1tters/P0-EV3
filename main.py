@@ -5,7 +5,10 @@ from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
 from pybricks.parameters import Port, Stop, Direction, Button, Color
 from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.robotics import DriveBase
-from pybricks.media.ev3dev import SoundFile, ImageFil
+from pybricks.media.ev3dev import SoundFile, ImageFile
+
+# Initialize the EV3 Brick.
+ev3 = EV3Brick()
 
 # Initialize the motors.
 left_motor = Motor(Port.A, Direction.CLOCKWISE)
@@ -27,7 +30,7 @@ WHITE = 85
 threshold = (BLACK + WHITE) / 2
 
 # Set the drive speed at 20 millimeters per second.
-DRIVE_SPEED = 50
+DRIVE_SPEED = 10
 
 # Set the gain of the proportional line controller. This means that for every
 # percentage point of light deviating from the threshold, we set the turn
@@ -39,14 +42,14 @@ PROPORTIONAL_GAIN = 1.2
 
 # Endless loop
 while True:
-
+    ev3.screen.print(line_sensor.reflection())
     # Check if we are on the path.
-    if line_sensor.reflection() > PATH_RANGE - 2 and line_sensor.reflection() < PATH_RANGE + 2:
+#    if line_sensor.reflection() > PATH_RANGE - 2 and line_sensor.reflection() < PATH_RANGE + 2:
         # Calculate the deviation from the threshold
-        deviation = line_sensor.reflection() - threshold
+        #deviation = line_sensor.reflection() - threshold
 
         # Calculate the turn rate.
-        turn_rate = PROPORTIONAL_GAIN * deviation
+        #turn_rate = PROPORTIONAL_GAIN * deviation
 
         # Set the drive base speed and turn rate.
-        robot.drive(DRIVE_SPEED, turn_rate)
+        #robot.drive(DRIVE_SPEED, turn_rate)

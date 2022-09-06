@@ -21,16 +21,16 @@ line_sensor = ColorSensor(Port.S3)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
 
 # Configure the path value measurements.
-PATH_RANGE = 20 # Sensor Reflection Value
-PATH_END_RANGE = 33 # Sensor Reflection Value
+PATH_RANGE = 30 # Sensor Reflection Value
+PATH_END_RANGE = 18 # Sensor Reflection Value
 
 # Calculate the threshold
-BLACK = 9
-WHITE = 85
+BLACK = 28
+WHITE = 50
 threshold = (BLACK + WHITE) / 2
 
 # Set the drive speed at 20 millimeters per second.
-DRIVE_SPEED = 10
+DRIVE_SPEED = 30
 
 # Set the gain of the proportional line controller. This means that for every
 # percentage point of light deviating from the threshold, we set the turn
@@ -40,16 +40,50 @@ DRIVE_SPEED = 10
 # steers at 10*1.2 = 12 degrees per second.
 PROPORTIONAL_GAIN = 1.2
 
-# Endless loop
-while True:
-    ev3.screen.print(line_sensor.reflection())
-    # Check if we are on the path.
-#    if line_sensor.reflection() > PATH_RANGE - 2 and line_sensor.reflection() < PATH_RANGE + 2:
-        # Calculate the deviation from the threshold
-        #deviation = line_sensor.reflection() - threshold
 
-        # Calculate the turn rate.
-        #turn_rate = PROPORTIONAL_GAIN * deviation
+class LineFollower:
+    last_rotation = None
+    robot, pv, wv, ov, ta = None
+    def __init__(self, robot: DriveBase, pv: int, wv: int, ov: int, ta: int):
+        #pv path value
+        #wv wall value
+        #off value
+        #turn angle
 
-        # Set the drive base speed and turn rate.
-        #robot.drive(DRIVE_SPEED, turn_rate)
+        self.robot = robot
+        self.pv = pv
+        self.wv = wv
+        self.ov = ov
+        self.ta = ta
+
+    def isOnPath(self) -> bool:
+        return PATH_RANGE + 15 > line_sensor.reflection() > PATH_RANGE - 8
+
+    def isOnWall(self) -> bool:
+        return PATH_END_RANGE + 4 > line_sensor.reflection() > PATH_END_RANGE - 3
+
+    def isOffPath(self) -> bool:
+        return not self.isOnPath() and not self.isOnWall()
+
+    def autocorrect_Path(self) -> None:
+        ev3.screen.print('Starting auto correct path..')
+        #TODO: MAKE IT WORK
+        robot.stop()
+
+        sm = 1
+        d = 1
+        while self.isOffPath() and sm * self.ta > 90:
+            ba = 1
+            if d < 0:
+                ba = 2
+            
+            robot.turn(self.ta * sm * d * ba)
+
+            if self.isOnPath():
+                break
+
+            if d < 0:
+                sm+= 1
+            d*=1
+
+    

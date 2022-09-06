@@ -42,8 +42,7 @@ PROPORTIONAL_GAIN = 1.2
 
 
 class LineFollower:
-    last_rotation = None
-    robot, pv, wv, ov, ta = None
+    robot, pv, wv, ov, ta, lr = None
     def __init__(self, robot: DriveBase, pv: int, wv: int, ov: int, ta: int):
         #pv path value
         #wv wall value
@@ -85,5 +84,3 @@ class LineFollower:
             if d < 0:
                 sm+= 1
             d*=1
-
-    

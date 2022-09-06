@@ -50,7 +50,3 @@ while True:
 
         # Set the drive base speed and turn rate.
         robot.drive(DRIVE_SPEED, turn_rate)
-
-    elif line_sensor.reflection() > PATH_END_RANGE - 2 and line_sensor.reflection() < PATH_END_RANGE + 2:
-        # call protocol method
-        print('end of path reached')

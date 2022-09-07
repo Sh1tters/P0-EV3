@@ -74,33 +74,33 @@ class Calibration:
             pv1 = self.line_sensor.reflection()
             wait(200)
             
-            self.robot.straight(50)
+            self.robot.straight(100)
+            wait(200)
             pv2 = self.line_sensor.reflection()
-            wait(200)
 
-            self.robot.straight(-40)
-            pv3 = self.line_sensor.reflection()
+            self.robot.straight(-80)
             wait(200)
+            pv3 = self.line_sensor.reflection()
 
             path_value = int((pv1 + pv2 + pv3) / 3)
             wait(800)
             self.ev3.screen.clear()
-            self.ev3.screen.print(f'Found path value {path_value}')
+            self.ev3.screen.print('Found path value {path_value}')
             wait (500)
 
             # change settings.py path values
-            jsonDump = json.dumps({"PATH_VALUE", path_value})
-            jsonFile = open("config.json", "w")
-            jsonFile.write(jsonDump)
-            jsonFile.close()
+            data = {"PATH_VALUE": path_value}
+
+            with open('config.json', 'w') as jsonfile:
+                json.dump(data, jsonfile)
             self.calibrated = True
 
             #Calibration DONE
             self.ev3.screen.clear()
-            self.ev3.screen.print(f'Calibration done')
+            self.ev3.screen.print('Calibration done')
 
             # Run linefollower
+            self.lf.path_value = path_value
             self.lf.run()
 
-            break
 

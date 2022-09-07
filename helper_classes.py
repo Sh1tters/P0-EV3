@@ -73,21 +73,27 @@ class Calibration:
     def run(self) -> None:
         while not self.calibrated:
             self.ev3.screen.print('Calibrating...')
-            pv1 = self.line_sensor.reflection()
-            wait(200)
-            
+
+            # First sample measurement
+            pv_s1 = self.line_sensor.reflection()
+
+            # Move sensor to unique position
             self.robot.straight(100)
-            wait(200)
-            pv2 = self.line_sensor.reflection()
+            wait(100)
 
+            # Second sample measurement
+            pv_s2 = self.line_sensor.reflection()
+
+            # Move sensor to unique position
             self.robot.straight(-80)
-            wait(200)
-            pv3 = self.line_sensor.reflection()
+            wait(100)
 
-            path_value = int((pv1 + pv2 + pv3) / 3)
-            wait(800)
+            # Third sample measurement
+            pv_s3 = self.line_sensor.reflection()
+
+            path_value = int((pv_s1 + pv_s2 + pv_s3) / 3)
             self.ev3.screen.clear()
-            self.ev3.screen.print('Found path value {path_value}')
+            self.ev3.screen.print('PATH_VALUE: %s' % path_value)
 
             # change settings.py path values
             data = {"PATH_VALUE": path_value}
@@ -100,7 +106,7 @@ class Calibration:
             self.ev3.screen.clear()
             self.ev3.screen.print('Calibration done')
 
-            # Run linefollower
+            # Run Linefollower
             self.lf.path_value = path_value
             self.lf.run()
 

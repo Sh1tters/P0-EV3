@@ -102,3 +102,5 @@ class Calibration:
             # Run linefollower
             self.lf.run()
 
+            break
+

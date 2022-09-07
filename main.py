@@ -6,7 +6,8 @@ from pybricks.robotics import DriveBase
 
 from settings import PATH_VALUE, WALL_VALUE, ACCEPTED_DEVIANCE, TURN_ANGLE, DRIVE_SPEED
 
-from helper_classes import LineFollower, Calibration
+from helper_classes import LineFollower
+from helper_classes import Calibration
 
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()

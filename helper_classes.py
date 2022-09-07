@@ -4,9 +4,10 @@ from pybricks.tools import wait
 import json
 
 class LineFollower:
-    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance, turn_angle: int, drive_speed: int):
+    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, ev3: EV3Brick, path_value: int, wall_value: int, accepted_deviance, turn_angle: int, drive_speed: int):
         self.robot = robot
         self.line_sensor = line_sensor
+        self.ev3 = ev3
         self.path_value = path_value
         self.wall_value = wall_value
         self.accepted_deviance = accepted_deviance
@@ -51,6 +52,7 @@ class LineFollower:
     def run(self) -> None:
         # Run Loop
         while not self.shut_down:
+            #self.ev3.screen.print(self.path_value, self.line_sensor.reflection())
             if self.isOnWall():
                 self.robot.stop()
                 # TODO: Change to challenge modes
@@ -86,7 +88,6 @@ class Calibration:
             wait(800)
             self.ev3.screen.clear()
             self.ev3.screen.print('Found path value {path_value}')
-            wait (500)
 
             # change settings.py path values
             data = {"PATH_VALUE": path_value}

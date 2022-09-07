@@ -2,7 +2,7 @@
 PATH_VALUE = 0 # Change Me
 WALL_VALUE = 0 # Change Me
 
-ACCEPTED_DEVIANCE = 5
+ACCEPTED_DEVIANCE = 10
 
 # Set Drive Speed and Angle
 DRIVE_SPEED = 75

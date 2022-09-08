@@ -167,3 +167,5 @@ cython_debug/
 
 # Exclude Settings
 settings.py
+
+config.json

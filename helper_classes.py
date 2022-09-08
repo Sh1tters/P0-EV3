@@ -1,3 +1,4 @@
+from pdb import line_prefix
 from pybricks.robotics import DriveBase
 from pybricks.ev3devices import ColorSensor
 from pybricks.tools import wait
@@ -31,7 +32,7 @@ class LineFollower:
         Returns:
             bool: Is on path
         """        
-        return self.path_value + self.accepted_deviance > self.line_sensor.reflection() > self.path_value - self.accepted_deviance
+        return self.path_value + self.accepted_deviance >= self.line_sensor.reflection() >= self.path_value - self.accepted_deviance
 
     def isOnWall(self) -> bool:
         """isOnWall Check if robot is on a wall
@@ -39,7 +40,7 @@ class LineFollower:
         Returns:
             bool: Is on wall
         """        
-        return self.wall_value + self.accepted_deviance > self.line_sensor.reflection() > self.wall_value - self.accepted_deviance
+        return self.path_value - self.accepted_deviance > self.line_sensor.reflection()
 
     def isOffPath(self) -> bool:
         """isOffPath Check if robot is off path
@@ -77,18 +78,20 @@ class LineFollower:
         while not self.shut_down:
             if self.isOnWall():
                 self.robot.stop()
+                break
                 # TODO: Change to challenge modes
             elif self.isOffPath():
                 self.autocorrectPath()
             else:
                 self.robot.drive(self.drive_speed, 0)
-                wait(10)
+                #wait(10)
 
 class Calibration:
     def __init__(self, robot: DriveBase, line_sensor: ColorSensor, lf: LineFollower) -> None:
         self.robot = robot
         self.line_sensor = line_sensor
         self.calibrated = False
+        self.lf = lf
 
     def run(self) -> None:
         while not self.calibrated:
@@ -113,7 +116,7 @@ class Calibration:
             path_value = int((pv_s1 + pv_s2 + pv_s3) / 3)
 
             # change settings.py path values
-            data = {"PATH_VALUE": self.path_value}
+            data = {"PATH_VALUE": path_value}
 
             with open('config.json', 'w') as jsonfile:
                 json.dump(data, jsonfile)

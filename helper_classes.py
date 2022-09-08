@@ -63,11 +63,11 @@ class LineFollower:
                 wait(10)
 
 class Calibration:
-    def __init__(self, robot: DriveBase, ev3: EV3Brick, line_sensor: ColorSensor, lf: LineFollower) -> None:
+
+    def __init__(self, robot: DriveBase, ev3: EV3Brick, line_sensor: ColorSensor) -> None:
         self.robot = robot
         self.ev3 = ev3
         self.line_sensor = line_sensor
-        self.lf = lf
         self.calibrated = False
 
     def run(self) -> None:
@@ -91,12 +91,12 @@ class Calibration:
             # Third sample measurement
             pv_s3 = self.line_sensor.reflection()
 
-            path_value = int((pv_s1 + pv_s2 + pv_s3) / 3)
+            self.path_value = int((pv_s1 + pv_s2 + pv_s3) / 3)
             self.ev3.screen.clear()
             self.ev3.screen.print('PATH_VALUE: %s' % path_value)
 
             # change settings.py path values
-            data = {"PATH_VALUE": path_value}
+            data = {"PATH_VALUE": self.path_value}
 
             with open('config.json', 'w') as jsonfile:
                 json.dump(data, jsonfile)
@@ -105,9 +105,3 @@ class Calibration:
             #Calibration DONE
             self.ev3.screen.clear()
             self.ev3.screen.print('Calibration done')
-
-            # Run Linefollower
-            self.lf.path_value = path_value
-            self.lf.run()
-
-

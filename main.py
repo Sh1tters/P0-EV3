@@ -21,9 +21,17 @@ line_sensor = ColorSensor(Port.S3)
 # Initialize the drive base.
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
 
-# Make Line Follower
-lf = LineFollower(robot, line_sensor, ev3, PATH_VALUE, WALL_VALUE, ACCEPTED_DEVIANCE, TURN_ANGLE, DRIVE_SPEED)
+lf = None
 
 # Make Calibration
 cal = Calibration(robot, ev3, line_sensor, lf)
-cal.run()
+
+while True:
+    if not cal.calibrated:
+        cal.run()
+
+    else:
+         # Make Line Follower
+        lf = LineFollower(robot, line_sensor, ev3, cal.path_value, WALL_VALUE, ACCEPTED_DEVIANCE, TURN_ANGLE, DRIVE_SPEED)
+        lf.run()
+        break

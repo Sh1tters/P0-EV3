@@ -52,6 +52,7 @@ class LineFollower:
         while not self.shut_down:
             if self.isOnWall():
                 self.robot.stop()
+                break
                 # TODO: Change to challenge modes
             elif self.isOffPath():
                 self.autocorrectPath()

@@ -4,10 +4,9 @@ from pybricks.tools import wait
 import json
 
 class LineFollower:
-    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, ev3: EV3Brick, path_value: int, wall_value: int, accepted_deviance, turn_angle: int, drive_speed: int):
+    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance, turn_angle: int, drive_speed: int):
         self.robot = robot
         self.line_sensor = line_sensor
-        self.ev3 = ev3
         self.path_value = path_value
         self.wall_value = wall_value
         self.accepted_deviance = accepted_deviance
@@ -30,9 +29,6 @@ class LineFollower:
         swing_multiplier = 1
         direction = 1
         while self.isOffPath() and swing_multiplier * self.turn_angle < 90:
-            #ba = 1
-            #if d < 0:
-            #    ba = 2
             
             self.robot.turn(self.turn_angle * swing_multiplier * direction)
 
@@ -52,7 +48,6 @@ class LineFollower:
     def run(self) -> None:
         # Run Loop
         while not self.shut_down:
-            #self.ev3.screen.print(self.path_value, self.line_sensor.reflection())
             if self.isOnWall():
                 self.robot.stop()
                 # TODO: Change to challenge modes
@@ -63,16 +58,14 @@ class LineFollower:
                 wait(10)
 
 class Calibration:
-    def __init__(self, robot: DriveBase, ev3: EV3Brick, line_sensor: ColorSensor, lf: LineFollower) -> None:
+    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, lf: LineFollower) -> None:
         self.robot = robot
-        self.ev3 = ev3
         self.line_sensor = line_sensor
         self.lf = lf
         self.calibrated = False
 
     def run(self) -> None:
         while not self.calibrated:
-            self.ev3.screen.print('Calibrating...')
 
             # First sample measurement
             pv_s1 = self.line_sensor.reflection()
@@ -92,8 +85,6 @@ class Calibration:
             pv_s3 = self.line_sensor.reflection()
 
             path_value = int((pv_s1 + pv_s2 + pv_s3) / 3)
-            self.ev3.screen.clear()
-            self.ev3.screen.print('PATH_VALUE: %s' % path_value)
 
             # change settings.py path values
             data = {"PATH_VALUE": path_value}
@@ -102,12 +93,5 @@ class Calibration:
                 json.dump(data, jsonfile)
             self.calibrated = True
 
-            #Calibration DONE
-            self.ev3.screen.clear()
-            self.ev3.screen.print('Calibration done')
-
             # Run Linefollower
             self.lf.path_value = path_value
-            self.lf.run()
-
-

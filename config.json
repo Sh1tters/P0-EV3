@@ -1,9 +1,0 @@
-{
-    "PATH_VALUE": 0,
-    "WALL_VALUE": 0,
-    
-    "ACCEPTED_DEVIANCE": 10,
-
-    "DRIVE_SPEED": 75,
-    "TURN_ANGLE": 10
-}

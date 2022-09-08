@@ -93,7 +93,7 @@ class Calibration:
 
             self.path_value = int((pv_s1 + pv_s2 + pv_s3) / 3)
             self.ev3.screen.clear()
-            self.ev3.screen.print('PATH_VALUE: %s' % path_value)
+            self.ev3.screen.print('PATH_VALUE: %s' % self.path_value)
 
             # change settings.py path values
             data = {"PATH_VALUE": self.path_value}

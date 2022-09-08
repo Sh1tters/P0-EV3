@@ -24,7 +24,7 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
 lf = None
 
 # Make Calibration
-cal = Calibration(robot, ev3, line_sensor, lf)
+cal = Calibration(robot, ev3, line_sensor)
 
 while True:
     if not cal.calibrated:

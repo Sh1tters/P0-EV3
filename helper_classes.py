@@ -5,7 +5,7 @@ from pybricks.tools import wait
 import json
 
 class LineFollower:  
-    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance, turn_angle: int, drive_speed: int):
+    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance: int, turn_angle: int, drive_speed: int):
         """__init__ Constructs the necessary variables and objects to build a line follower
 
         Args:
@@ -13,7 +13,7 @@ class LineFollower:
             line_sensor (ColorSensor): The sensor to detect the line
             path_value (int): Reflection value of the line
             wall_value (int): Reflection valie of the walls
-            accepted_deviance (_type_): The accepted deviance/change in reflection
+            accepted_deviance (int): The accepted deviance/change in reflection
             turn_angle (int): The angle of which we want to turn
             drive_speed (int): The speed we want to drive
         """        

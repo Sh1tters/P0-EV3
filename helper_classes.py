@@ -61,7 +61,6 @@ class Calibration:
     def __init__(self, robot: DriveBase, line_sensor: ColorSensor, lf: LineFollower) -> None:
         self.robot = robot
         self.line_sensor = line_sensor
-        self.lf = lf
         self.calibrated = False
 
     def run(self) -> None:
@@ -87,7 +86,7 @@ class Calibration:
             path_value = int((pv_s1 + pv_s2 + pv_s3) / 3)
 
             # change settings.py path values
-            data = {"PATH_VALUE": path_value}
+            data = {"PATH_VALUE": self.path_value}
 
             with open('config.json', 'w') as jsonfile:
                 json.dump(data, jsonfile)

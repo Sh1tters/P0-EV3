@@ -30,28 +30,28 @@ lf.run()
 robot.turn(45)
 robot.straight(100)
 while True:
-    #if line_sensor.reflection() > lf.path_value
-    if line_sensor.reflection() > 30:
-        robot.drive(100, 0)
-    #if line_sensor.reflection() < lf.path_value
-    if line_sensor.reflection() < 30:
+    if lf.isOnPath():
+        robot.stop()
         robot.straight(70)
         robot.turn(-45)
         break
+    else:
+        robot.drive(100, 0)
 
 # Begin LineFollower again, once it finds the new path.
 lf.run() 
 
 # 2. wall - solution for the 2. broken path.
-robot.turn(-45)
 robot.straight(100)
-while True: 
-    if line_sensor.reflection() > 30:
-        robot.drive(100, 0)
-    if line_sensor.reflection() < 30:
+robot.turn(-45)
+while True:
+    if lf.isOnPath():
+        robot.stop()
         robot.straight(70)
         robot.turn(45)
         break
+    else:
+        robot.drive(100, 0)
 
 # Begin LineFollower again, once it finds the new line.
 lf.run()

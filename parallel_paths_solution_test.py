@@ -6,7 +6,7 @@ from pybricks.robotics import DriveBase
 
 from settings import PATH_VALUE, WALL_VALUE, ACCEPTED_DEVIANCE, TURN_ANGLE, DRIVE_SPEED
 
-from helper_classes import LineFollower
+from helper_classes import LineFollower, Calibration
 
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
@@ -31,13 +31,12 @@ lf = LineFollower(robot, line_sensor, PATH_VALUE, WALL_VALUE, ACCEPTED_DEVIANCE,
 # Contains changing path twice on the left side of the robot.
 
 
-
 robot.straight(200)
-robot.turn(-90)
+robot.turn(-45)
+robot.straight(-300)
 
 n = 0
 while True:
-    
     if n == 0:
         robot.drive(50,0)
         if line_sensor.reflection() > 30: #== lf.isOffPath():
@@ -45,7 +44,6 @@ while True:
             ev3.screen.print(n)
             robot.drive(50,0)
 
-    
     if n == 1:
         robot.drive(50,0)
         if line_sensor.reflection() < 30: #== lf.isOnPath():
@@ -54,17 +52,32 @@ while True:
             robot.drive(50,0)
 
     if n == 2:
+        robot.drive(50,0)
         if line_sensor.reflection() > 30: #== lf.isOffPath():
             n += 1
             ev3.screen.print(n)
             robot.drive(50,0)
 
+    
     if n == 3:
+        robot.drive(50,0)
+        if line_sensor.reflection() < 30: #== lf.isOnPath():
+            n += 1
+            ev3.screen.print(n)
+            robot.drive(50,0)
+
+    if n == 4:
+        if line_sensor.reflection() > 30: #== lf.isOffPath():
+            n += 1
+            ev3.screen.print(n)
+            robot.drive(50,0)
+
+    if n == 5:
         if line_sensor.reflection() < 30:
             n += 1
             ev3.screen.print(n)
             robot.straight(70)
-            robot.turn(90)
+            robot.turn(45)
             break
 
 lf.run()

@@ -3,10 +3,9 @@ from pybricks.hubs import EV3Brick
 from pybricks.ev3devices import Motor, ColorSensor
 from pybricks.parameters import Port, Direction
 from pybricks.robotics import DriveBase
+from pybricks.tools import wait
 
-from settings import PATH_VALUE, WALL_VALUE, ACCEPTED_DEVIANCE, TURN_ANGLE, DRIVE_SPEED
-
-from helper_classes import LineFollower, Calibration
+from helper_classes import LineFollower, SettingsManager
 
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
@@ -21,11 +20,25 @@ line_sensor = ColorSensor(Port.S3)
 # Initialize the drive base.
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104)
 
+# Make settingsManager
+sm = SettingsManager()
+if not sm.loadSettings():
+    ev3.screen.print("Settings not loaded... stopping")
+    wait(10000)
+    exit(1)
+
+path_value = sm.getSetting("path_value")
+accepted_deviance = sm.getSetting("accepted_deviance")
+turn_angle = sm.getSetting("turn_angle")
+drive_speed = sm.getSetting("drive_speed")
+
 # Make Line Follower
-lf = LineFollower(robot, line_sensor, PATH_VALUE, WALL_VALUE, ACCEPTED_DEVIANCE, TURN_ANGLE, DRIVE_SPEED)
+lf = LineFollower(robot, line_sensor, path_value, accepted_deviance, turn_angle, drive_speed)
 
 # Make Calibration
-cal = Calibration(robot, line_sensor, lf)
-cal.run()
+path_value = lf.calibrate()
+lf.path_value = path_value
+sm.setSetting("path_value", path_value)
 
+# Run the line follower
 lf.run()

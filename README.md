@@ -2,4 +2,4 @@
 P0 Project, AUU (1. Semester) - COMTEK1 - Group: 135
 
 # Setup
-- Rename `settings.py.example` to `settings.py` and set the `PATH_VALUE` and `WALL_VALUE` variables
+- Rename `config.example.json` to `config.json` and set the correct values for you

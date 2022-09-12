@@ -1,11 +1,11 @@
-from pdb import line_prefix
 from pybricks.robotics import DriveBase
 from pybricks.ev3devices import ColorSensor
 from pybricks.tools import wait
+from os import listdir
 import json
 
 class LineFollower:  
-    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance: int, turn_angle: int, drive_speed: int):
+    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, path_value: int, accepted_deviance: int, turn_angle: int, drive_speed: int):
         """__init__ Constructs the necessary variables and objects to build a line follower
 
         Args:
@@ -20,7 +20,6 @@ class LineFollower:
         self.robot = robot
         self.line_sensor = line_sensor
         self.path_value = path_value
-        self.wall_value = wall_value
         self.accepted_deviance = accepted_deviance
         self.turn_angle = turn_angle
         self.drive_speed = drive_speed
@@ -70,6 +69,24 @@ class LineFollower:
                 swing_multiplier += 1
             
             direction *= -1
+    
+    def calibrate(self, sample_size: int = 3) -> int:
+        """calibrate Calibrate the reflection value of the track
+
+        Args:
+            sample_size (int, optional): The amount of samples there should be taken. Defaults to 3.
+
+        Returns:
+            int: The average reflection value of the track
+        """        
+        samples = list()
+        for i in range(sample_size):
+            samples.append(self.line_sensor.reflection())
+            self.robot.straight(50)
+            wait(100)
+        
+        self.path_value = sum(samples)/sample_size
+        return self.path_value
 
     def run(self) -> None:
         """run Run the Line Following
@@ -84,43 +101,76 @@ class LineFollower:
                 self.autocorrectPath()
             else:
                 self.robot.drive(self.drive_speed, 0)
-                #wait(10)
 
-class Calibration:
-    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, lf: LineFollower) -> None:
-        self.robot = robot
-        self.line_sensor = line_sensor
-        self.calibrated = False
-        self.lf = lf
+class SettingsManager():
+    def __init__(self) -> None:
+        """__init__ Constructs the SettingsManager
+        """        
+        self._settings = dict()
+    
+    def checkSettingsFileExists(self) -> bool:
+        """checkSettingsFileExists Checks if 'config.json' exists
 
-    def run(self) -> None:
-        while not self.calibrated:
+        Returns:
+            bool: File exists
+        """        
+        return 'config.json' in listdir()
+    
+    def checkSettingsExist(self) -> bool:
+        """checkSettingsExist Checks of the internal settings dictionary exists
 
-            # First sample measurement
-            pv_s1 = self.line_sensor.reflection()
+        Returns:
+            bool: Dictionary exists
+        """                
+        return len(self._settings) > 0
+    
+    def checkIfSettingKeyExists(self, key: str) -> bool:
+        """checkIfSettingKeyExists Checks if the settings key exists in the internal settings dictionary
 
-            # Move sensor to unique position
-            self.robot.straight(100)
-            wait(100)
+        Args:
+            key (str): Key to check
 
-            # Second sample measurement
-            pv_s2 = self.line_sensor.reflection()
+        Returns:
+            bool: Key exists
+        """        
+        return key in self._settings.keys()
 
-            # Move sensor to unique position
-            self.robot.straight(-80)
-            wait(100)
+    def loadSettings(self) -> bool:
+        """loadSettings Loads settings from 'config.json' into the internal settings dictionary
 
-            # Third sample measurement
-            pv_s3 = self.line_sensor.reflection()
+        Returns:
+            bool: Settings loaded
+        """           
+        if self.checkSettingsFileExists():
+            with open("config.json", "r") as fp:
+                self._settings = json.load(fp)
+            return True
+        return False
 
-            path_value = int((pv_s1 + pv_s2 + pv_s3) / 3)
+    def setSetting(self, key: str, value) -> bool:
+        """set_setting Set/change setting in the internal settings dictionary
 
-            # change settings.py path values
-            data = {"PATH_VALUE": path_value}
+        Args:
+            key (str): Key to set to
+            value (Any): Value to set
 
-            with open('config.json', 'w') as jsonfile:
-                json.dump(data, jsonfile)
-            self.calibrated = True
+        Returns:
+            bool: Setting is set
+        """        
+        if self.checkSettingsFileExists() and self.checkSettingsExist():
+            self._settings[key] = value
+            return True
+        return False
 
-            # Run Linefollower
-            self.lf.path_value = path_value
+    def getSetting(self, key: str):
+        """get_setting Get a setting value
+
+        Args:
+            key (str): Key to get from
+
+        Returns:
+            Any: Value from key or None if key didn't exist
+        """        
+        if self.checkIfSettingKeyExists:
+            return self._settings[key]
+        return None

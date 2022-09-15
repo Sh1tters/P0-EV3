@@ -99,15 +99,13 @@ class Calibration:
             pv_s1 = self.line_sensor.reflection()
 
             # Move sensor to unique position
-            self.robot.straight(100)
-            wait(100)
+            self.robot.straight(50)
 
             # Second sample measurement
             pv_s2 = self.line_sensor.reflection()
 
             # Move sensor to unique position
-            self.robot.straight(-80)
-            wait(100)
+            self.robot.straight(-30)
 
             # Third sample measurement
             pv_s3 = self.line_sensor.reflection()

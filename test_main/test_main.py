@@ -38,13 +38,13 @@ lf.run()
  
 # After first wall, LineFollower loop will break and
 # begin on the following solution for the broken path.
+robot.turn(45)
 robot.straight(100)
-robot.turn(90)
 while True:
     if lf.isOnPath():
         robot.stop()
         robot.straight(70)
-        robot.turn(-90)
+        robot.turn(-45)
         break
     else:
         robot.drive(100, 0)
@@ -54,12 +54,12 @@ lf.run()
 
 # 2. wall - solution for the 2. broken path.
 robot.straight(100)
-robot.turn(-90)
+robot.turn(-45)
 while True:
     if lf.isOnPath():
         robot.stop()
         robot.straight(70)
-        robot.turn(90)
+        robot.turn(45)
         break
     else:
         robot.drive(100, 0)
@@ -76,8 +76,8 @@ lf.run()
 # This is due to the touch sensor.
 
 # I have chosen to make a 45 degree turn, then have the robot drive 2 cm.
-robot.turn(60)
-robot.straight(80)
+robot.turn(45)
+robot.straight(50)
 
 # Then is will drive until it finds the path.
 while True:
@@ -95,7 +95,7 @@ while True:
     if lf.isOffPath():
         robot.turn(3)
     if lf.isOnPath():
-        robot.turn(66)
+        robot.turn(46)
         # It will now open the claw.
         claw_motor.run_time(-1000,2300)
         break
@@ -149,7 +149,7 @@ while True:
         robot.drive(100, 0)
     if lf.isOnPath():
         robot.straight(60)
-        robot.turn(80)
+        robot.turn(45)
         break
 
 # Now the robot will begin linefollowing until the next wall.

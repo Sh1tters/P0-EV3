@@ -140,7 +140,8 @@ claw_motor.run_time(-1000,2000, wait = True)
 claw_motor.run_until_stalled(-1000,then = Stop.COAST, duty_limit = 30)
 robot.straight(-400)
 claw_motor.run_time(1000,2500)
-robot.turn(-195)
+robot.turn(-180)
+robot.straight(150)
 
 # The robot will now drive until it finds the path again.
 
@@ -169,45 +170,45 @@ lf.run()
 
 
 robot.straight(200)
-robot.turn(-45)
-robot.straight(-300)
+robot.turn(-65)
+robot.straight(-200)
 
 n = 0
 while True:
     if n == 0:
-        robot.drive(50,0)
+        robot.drive(100,0)
         if lf.isOffPath():
             n += 1
             ev3.screen.print(n)
-            robot.drive(50,0)
+            robot.drive(100,0)
 
     if n == 1:
-        robot.drive(50,0)
+        robot.drive(100,0)
         if lf.isOnPath():
             n += 1
             ev3.screen.print(n)
-            robot.drive(50,0)
+            robot.drive(100,0)
 
     if n == 2:
-        robot.drive(50,0)
+        robot.drive(100,0)
         if lf.isOffPath():
             n += 1
             ev3.screen.print(n)
-            robot.drive(50,0)
+            robot.drive(100,0)
 
     
     if n == 3:
-        robot.drive(50,0)
+        robot.drive(100,0)
         if lf.isOnPath():
             n += 1
             ev3.screen.print(n)
-            robot.drive(50,0)
+            robot.drive(100,0)
 
     if n == 4:
         if lf.isOffPath():
             n += 1
             ev3.screen.print(n)
-            robot.drive(50,0)
+            robot.drive(100,0)
 
     if n == 5:
         if lf.isOnPath():

@@ -31,7 +31,7 @@ class LineFollower:
         self.comulative_turn_size = 10
         self.comulative_turn = 0
         self.last_decay_time = 0
-        self.decay_timeframe = 1
+        self.decay_timeframe = .5
     
     def isOnPath(self) -> bool:
         """isOnPath Check if robot is on path
@@ -81,17 +81,17 @@ class LineFollower:
         if not swing_multiplier * self.turn_angle < 90:
             self.robot.straight(10)
         
-        if self.last_autocorrect_time >= int(time.time()) - self.autocorrect_timeframe:
+        if self.last_autocorrect_time >= time.time() - self.autocorrect_timeframe:
             self.comulative_turn += direction * self.comulative_turn_size
         
-        self.last_autocorrect_time = self.last_decay_time = int(time.time())
+        self.last_autocorrect_time = self.last_decay_time = time.time()
         self.last_turn_direction = direction
 
     def run(self) -> None:
         """run Run the Line Following
         """        
         # Set autocorrect time
-        self.last_autocorrect_time = self.last_decay_time = int(time.time())
+        self.last_autocorrect_time = self.last_decay_time = time.time()
 
         # Run Loop
         while not self.shut_down:
@@ -105,9 +105,9 @@ class LineFollower:
                 self.autocorrectPath()
             else:
                 self.robot.drive(self.drive_speed, self.comulative_turn)
-                if self.last_decay_time + self.decay_timeframe <= int(time.time()) and self.comulative_turn != 0:
+                if self.last_decay_time + self.decay_timeframe <= time.time() and self.comulative_turn != 0:
                     self.comulative_turn -= (self.comulative_turn/(self.comulative_turn**2)**.5) * self.comulative_turn_size
-                    self.last_decay_time = int(time.time())
+                    self.last_decay_time = time.time()
 
 class Calibration:
     def __init__(self, robot: DriveBase, line_sensor: ColorSensor, lf: LineFollower) -> None:

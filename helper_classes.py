@@ -1,7 +1,8 @@
+from time import time
 from pybricks.robotics import DriveBase
 from pybricks.ev3devices import ColorSensor
 from pybricks.tools import wait
-import json
+import json, time
 
 class LineFollower:  
     def __init__(self, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance: int, turn_angle: int, drive_speed: int):
@@ -24,6 +25,13 @@ class LineFollower:
         self.turn_angle = turn_angle
         self.drive_speed = drive_speed
         self.shut_down = False
+        self.last_turn_direction = 1
+        self.last_autocorrect_time = 0
+        self.autocorrect_timeframe = 1
+        self.comulative_turn_size = 10
+        self.comulative_turn = 0
+        self.last_decay_time = 0
+        self.decay_timeframe = 1
     
     def isOnPath(self) -> bool:
         """isOnPath Check if robot is on path
@@ -55,7 +63,7 @@ class LineFollower:
         self.robot.stop()
 
         swing_multiplier = 1
-        direction = 1
+        direction = self.last_turn_direction
         while self.isOffPath() and swing_multiplier * self.turn_angle < 90:
             
             self.robot.turn(self.turn_angle * swing_multiplier * direction)
@@ -65,25 +73,41 @@ class LineFollower:
 
             self.robot.turn(self.turn_angle * swing_multiplier * -direction)
 
-            if direction < 0:
+            if direction != self.last_turn_direction:
                 swing_multiplier += 1
             
             direction *= -1
+        
+        if not swing_multiplier * self.turn_angle < 90:
+            self.robot.straight(10)
+        
+        if self.last_autocorrect_time >= int(time.time()) - self.autocorrect_timeframe:
+            self.comulative_turn += direction * self.comulative_turn_size
+        
+        self.last_autocorrect_time = self.last_decay_time = int(time.time())
+        self.last_turn_direction = direction
 
     def run(self) -> None:
         """run Run the Line Following
         """        
+        # Set autocorrect time
+        self.last_autocorrect_time = self.last_decay_time = int(time.time())
+
         # Run Loop
         while not self.shut_down:
             if self.isOnWall():
                 self.robot.stop()
+                self.comulative_turn = 0
+                self.last_turn_direction = 1
                 break
                 # TODO: Change to challenge modes
             elif self.isOffPath():
                 self.autocorrectPath()
             else:
-                self.robot.drive(self.drive_speed, 0)
-                #wait(10)
+                self.robot.drive(self.drive_speed, self.comulative_turn)
+                if self.last_decay_time + self.decay_timeframe <= int(time.time()) and self.comulative_turn != 0:
+                    self.comulative_turn -= (self.comulative_turn/(self.comulative_turn**2)**.5) * self.comulative_turn_size
+                    self.last_decay_time = int(time.time())
 
 class Calibration:
     def __init__(self, robot: DriveBase, line_sensor: ColorSensor, lf: LineFollower) -> None:
@@ -99,15 +123,13 @@ class Calibration:
             pv_s1 = self.line_sensor.reflection()
 
             # Move sensor to unique position
-            self.robot.straight(100)
-            wait(100)
+            self.robot.straight(50)
 
             # Second sample measurement
             pv_s2 = self.line_sensor.reflection()
 
             # Move sensor to unique position
-            self.robot.straight(-80)
-            wait(100)
+            self.robot.straight(-30)
 
             # Third sample measurement
             pv_s3 = self.line_sensor.reflection()

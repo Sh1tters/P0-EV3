@@ -8,6 +8,7 @@ pybricks = "*"
 
 [dev-packages]
 ipython = "*"
+pynvim = "*"
 
 [requires]
 python_version = "3.10"

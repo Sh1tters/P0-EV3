@@ -5,8 +5,7 @@ from pybricks.ev3devices import ColorSensor
 from pybricks.tools import wait
 import json
 
-from settings import DRIVE_SPEED, GREY_VALUE, PATH_VALUE
-
+from settings import PATH_VALUE, WALL_VALUE, ACCEPTED_DEVIANCE, TURN_ANGLE, DRIVE_SPEED
 class LineFollower:  
     def __init__(self, ev3: EV3Brick, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance: int, turn_angle: int, drive_speed: int):
         """__init__ Constructs the necessary variables and objects to build a line follower
@@ -43,7 +42,7 @@ class LineFollower:
         Returns:
             bool: Is on path
         """        
-        return self.path_value + self.accepted_deviance >= self.line_sensor.reflection() >= self.path_value - self.accepted_deviance
+        return self.line_sensor.reflection() <= self.path_value
 
     def isOnWall(self) -> bool:
         """isOnWall Check if robot is on a wall
@@ -52,9 +51,6 @@ class LineFollower:
             bool: Is on wall
         """        
         return 20 > self.line_sensor.reflection()
-
-    def isOffPathGrey(self) -> bool:
-        return self.line_sensor.reflection() < self.path_value
 
     def isOffPath(self) -> bool:
         """isOffPath Check if robot is off path
@@ -70,30 +66,10 @@ class LineFollower:
         """        
         while not self.isOnWall():
             deviation = self.path_value - self.line_sensor.reflection()
-            proportional_gain = 1.6
+            proportional_gain = 6
             turn_rate = proportional_gain * deviation
 
-        
-       
-            self.ev3.screen.print("FollowPath")
             self.robot.drive(DRIVE_SPEED, int(turn_rate))
-            wait(1)
-    
-    def ReverseFollowPath(self) -> None:
-        """autocorrectPath Autocorrect to the path
-        """        
-        while not self.isOnWall():
-            deviation = self.path_value - self.line_sensor.reflection()
-            proportional_gain = 1.6
-            turn_rate = proportional_gain * deviation
-
-        
-       
-            self.ev3.screen.print("FollowPath")
-            self.robot.drive(-DRIVE_SPEED, int(turn_rate))
-            wait(1)
-
-
 
 
     def run(self) -> None:
@@ -104,29 +80,10 @@ class LineFollower:
         while True:
             if self.isOnWall():
                 self.robot.stop()
-                self.ev3.screen.print("Black Wall")
                 wait(10)
                 break
-                # TODO: Change to challenge modes
             else:
                 self.FollowPath()
-                self.ev3.screen.print(self.path_value - self.line_sensor.reflection())
-
-
-    def reverse_run(self) -> None:
-        """run Run the Line Following
-                """
-         # Run Loop
-        while True:
-            if self.isOnWall():
-                self.robot.stop()
-                self.ev3.screen.print("Black Wall")
-                wait(10)
-                break
-                # TODO: Change to challenge modes
-            else:
-                self.ReverseFollowPath()
-                self.ev3.screen.print(self.path_value - self.line_sensor.reflection())
                 
         
             
@@ -149,8 +106,7 @@ class Calibration:
             # First sample measurement
             pv_s1 = self.line_sensor.reflection()
             self.ev3.screen.print(self.line_sensor.reflection())
-            wait(500)
-            
+            wait(50)
 
             # Move sensor to unique position
             self.robot.turn(30)
@@ -158,18 +114,17 @@ class Calibration:
             # Second sample measurement
             pv_s2 = self.line_sensor.reflection()
             self.ev3.screen.print(self.line_sensor.reflection())
-            wait(500)
+            wait(50)
 
             # Move sensor to unique position
             self.robot.turn(-15)
             self.ev3.screen.print(self.line_sensor.reflection())
-            wait(1000)
 
             # Third sample measurement
             #pv_s3 = self.line_sensor.reflection()
 
             path_value = int((pv_s1 + pv_s2) / 2)
-
+            wait(50)
         
 
             # change settings.py path values

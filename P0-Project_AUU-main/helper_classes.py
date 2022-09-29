@@ -5,9 +5,8 @@ from pybricks.ev3devices import ColorSensor
 from pybricks.tools import wait
 import json
 
-from settings import PATH_VALUE, WALL_VALUE, ACCEPTED_DEVIANCE, TURN_ANGLE, DRIVE_SPEED
 class LineFollower:  
-    def __init__(self, ev3: EV3Brick, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance: int, turn_angle: int, drive_speed: int):
+    def __init__(self, ev3: EV3Brick, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance: int, turn_angle: int):
         """__init__ Constructs the necessary variables and objects to build a line follower
 
         Args:
@@ -26,7 +25,7 @@ class LineFollower:
         self.wall_value = wall_value
         self.accepted_deviance = accepted_deviance
         self.turn_angle = turn_angle
-        self.drive_speed = drive_speed
+        #self.drive_speed = drive_speed
         self.shut_down = False
         self.last_turn_direction = 1
         self.last_autocorrect_time = 0
@@ -61,18 +60,18 @@ class LineFollower:
         return not self.isOnPath() and not self.isOnWall()
 
 
-    def FollowPath(self) -> None:
+    def FollowPath(self, DRIVE_SPEED) -> None:
         """autocorrectPath Autocorrect to the path
         """        
         while not self.isOnWall():
             deviation = self.path_value - self.line_sensor.reflection()
-            proportional_gain = 6
-            turn_rate = proportional_gain * deviation
+            proportional_gain = 3
+            turn_rate = proportional_gain * deviation * (DRIVE_SPEED/250)
 
             self.robot.drive(DRIVE_SPEED, int(turn_rate))
 
 
-    def run(self) -> None:
+    def run(self, DRIVE_SPEED) -> None:
         """run Run the Line Following
                 """
 
@@ -83,7 +82,7 @@ class LineFollower:
                 wait(10)
                 break
             else:
-                self.FollowPath()
+                self.FollowPath(DRIVE_SPEED)
                 
         
             

@@ -65,7 +65,7 @@ class LineFollower:
         """        
         while not self.isOnWall():
             deviation = self.path_value - self.line_sensor.reflection()
-            proportional_gain = 3
+            proportional_gain = 2
             turn_rate = proportional_gain * deviation * (DRIVE_SPEED/250)
 
             self.robot.drive(DRIVE_SPEED, int(turn_rate))
@@ -79,7 +79,6 @@ class LineFollower:
         while True:
             if self.isOnWall():
                 self.robot.stop()
-                wait(10)
                 break
             else:
                 self.FollowPath(DRIVE_SPEED)

@@ -71,13 +71,15 @@ class LineFollower:
             self.robot.drive(DRIVE_SPEED, int(turn_rate))
 
 
-    def run(self, DRIVE_SPEED) -> None:
+    def run(self, DRIVE_SPEED, drive_time=None) -> None:
         """run Run the Line Following
                 """
-
+        if drive_time != None: start_time = time()
         # Run Loop
         while True:
-            if self.isOnWall():
+            if drive_time != None: now_time = time()
+            
+            if self.isOnWall() or drive_time != None and now_time - start_time >= drive_time:
                 self.robot.stop()
                 break
             else:

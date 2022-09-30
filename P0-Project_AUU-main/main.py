@@ -123,10 +123,15 @@ robot.turn(90)
 lf.run(50)
 line_sensor_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=30)
 robot.straight(500)
+#line_sensor_motor.run_time(-500, 800, wait=True)
+"""
+lf.run(100, drive_time=2)
+line_sensor_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=30)
+robot.straight(600)
 line_sensor_motor.run_time(-500, 800, wait=True)
+"""
+robot.straight(1000)
 lf.run(100)
-#line_sensor_motor.run_time(-500, 1000, wait=True)
-
 
 # 7. wall - solution for parallel paths.
 # Contains changing path twice on the left side of the robot.

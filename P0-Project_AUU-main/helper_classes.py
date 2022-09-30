@@ -1,4 +1,4 @@
-from time import time
+import time
 from pybricks.hubs import EV3Brick
 from pybricks.robotics import DriveBase
 from pybricks.ev3devices import ColorSensor
@@ -74,12 +74,12 @@ class LineFollower:
     def run(self, DRIVE_SPEED, drive_time=None) -> None:
         """run Run the Line Following
                 """
-        if drive_time != None: start_time = time()
+        start_time = time.time()
+        debug_big_nums = (int(start_time) // 100) * 100
         # Run Loop
         while True:
-            if drive_time != None: now_time = time()
-            
-            if self.isOnWall() or drive_time != None and now_time - start_time >= drive_time:
+            self.ev3.screen.print(str(int(start_time)-debug_big_nums) + " " + str(int(time.time())-debug_big_nums) + " " + str(drive_time))     
+            if self.isOnWall() or (drive_time != None and time.time() - start_time >= drive_time):
                 self.robot.stop()
                 break
             else:

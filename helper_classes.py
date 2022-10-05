@@ -1,29 +1,23 @@
-from time import time
+import time
+from pybricks.hubs import EV3Brick
 from pybricks.robotics import DriveBase
 from pybricks.ev3devices import ColorSensor
 from pybricks.tools import wait
-import json, time
+import json
 
 class LineFollower:  
-    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance: int, turn_angle: int, drive_speed: int):
+    def __init__(self, ev3: EV3Brick, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance: int, turn_angle: int):
         """__init__ Constructs the necessary variables and objects to build a line follower
 
         Args:
+            ev3 (EV3Brick): The mindstorms brick
             robot (DriveBase): The robot DriveBase
             line_sensor (ColorSensor): The sensor to detect the line
-            path_value (int): Reflection value of the line
-            wall_value (int): Reflection valie of the walls
-            accepted_deviance (int): The accepted deviance/change in reflection
-            turn_angle (int): The angle of which we want to turn
-            drive_speed (int): The speed we want to drive
         """        
         self.robot = robot
+        self.ev3 = ev3
         self.line_sensor = line_sensor
-        self.path_value = path_value
-        self.wall_value = wall_value
-        self.accepted_deviance = accepted_deviance
-        self.turn_angle = turn_angle
-        self.drive_speed = drive_speed
+        self.path_value = 0
         self.shut_down = False
         self.last_turn_direction = 1
         self.last_autocorrect_time = 0
@@ -39,7 +33,7 @@ class LineFollower:
         Returns:
             bool: Is on path
         """        
-        return self.path_value + self.accepted_deviance >= self.line_sensor.reflection() >= self.path_value - self.accepted_deviance
+        return self.line_sensor.reflection() <= self.path_value
 
     def isOnWall(self) -> bool:
         """isOnWall Check if robot is on a wall
@@ -47,7 +41,7 @@ class LineFollower:
         Returns:
             bool: Is on wall
         """        
-        return self.path_value - self.accepted_deviance > self.line_sensor.reflection()
+        return 20 > self.line_sensor.reflection()
 
     def isOffPath(self) -> bool:
         """isOffPath Check if robot is off path
@@ -57,86 +51,66 @@ class LineFollower:
         """        
         return not self.isOnPath() and not self.isOnWall()
 
-    def autocorrectPath(self) -> None:
+
+    def FollowPath(self, DRIVE_SPEED) -> None:
         """autocorrectPath Autocorrect to the path
         """        
-        self.robot.stop()
+        while not self.isOnWall():
+            deviation = self.path_value - self.line_sensor.reflection()
+            proportional_gain = 2
+            turn_rate = proportional_gain * deviation * (DRIVE_SPEED/250)
 
-        swing_multiplier = 1
-        direction = self.last_turn_direction
-        while self.isOffPath() and swing_multiplier * self.turn_angle < 90:
-            
-            self.robot.turn(self.turn_angle * swing_multiplier * direction)
+            self.robot.drive(DRIVE_SPEED, int(turn_rate))
 
-            if self.isOnPath():
-                break
 
-            self.robot.turn(self.turn_angle * swing_multiplier * -direction)
-
-            if direction != self.last_turn_direction:
-                swing_multiplier += 1
-            
-            direction *= -1
-        
-        if not swing_multiplier * self.turn_angle < 90:
-            self.robot.straight(10)
-        
-        if self.last_autocorrect_time >= time.time() - self.autocorrect_timeframe:
-            self.comulative_turn += direction * self.comulative_turn_size
-        
-        self.last_autocorrect_time = self.last_decay_time = time.time()
-        self.last_turn_direction = direction
-
-    def run(self) -> None:
+    def run(self, DRIVE_SPEED, drive_time=None) -> None:
         """run Run the Line Following
-        """        
-        # Set autocorrect time
-        self.last_autocorrect_time = self.last_decay_time = time.time()
-
+                """
+        start_time = time.time()
+        debug_big_nums = (int(start_time) // 100) * 100
         # Run Loop
-        while not self.shut_down:
-            if self.isOnWall():
+        while True:
+            self.ev3.screen.print(str(int(start_time)-debug_big_nums) + " " + str(int(time.time())-debug_big_nums) + " " + str(drive_time))     
+            if self.isOnWall() or (drive_time != None and time.time() - start_time >= drive_time):
                 self.robot.stop()
-                self.comulative_turn = 0
-                self.last_turn_direction = 1
                 break
-                # TODO: Change to challenge modes
-            elif self.isOffPath():
-                self.autocorrectPath()
             else:
-                self.robot.drive(self.drive_speed, self.comulative_turn)
-                if self.last_decay_time + self.decay_timeframe <= time.time() and self.comulative_turn != 0:
-                    self.comulative_turn -= (self.comulative_turn/(self.comulative_turn**2)**.5) * self.comulative_turn_size
-                    self.last_decay_time = time.time()
+                self.FollowPath(DRIVE_SPEED)
 
 class Calibration:
-    def __init__(self, robot: DriveBase, line_sensor: ColorSensor, lf: LineFollower) -> None:
+    def __init__(self, ev3: EV3Brick, robot: DriveBase, line_sensor: ColorSensor, lf: LineFollower) -> None:
         self.robot = robot
         self.line_sensor = line_sensor
         self.calibrated = False
         self.lf = lf
+        self.ev3 = ev3
 
     def run(self) -> None:
         while not self.calibrated:
+            self.robot.turn(-15)
 
             # First sample measurement
             pv_s1 = self.line_sensor.reflection()
+            self.ev3.screen.print(self.line_sensor.reflection())
+            wait(50)
 
             # Move sensor to unique position
-            self.robot.straight(50)
+            self.robot.turn(30)
 
             # Second sample measurement
             pv_s2 = self.line_sensor.reflection()
+            self.ev3.screen.print(self.line_sensor.reflection())
+            wait(50)
 
-            # Move sensor to unique position
-            self.robot.straight(-30)
+            # Move sensor to first position
+            self.robot.turn(-15)
+            self.ev3.screen.print(self.line_sensor.reflection())
 
-            # Third sample measurement
-            pv_s3 = self.line_sensor.reflection()
+            # Calculate average value between samples
+            path_value = int((pv_s1 + pv_s2) / 2)
+            wait(50)
 
-            path_value = int((pv_s1 + pv_s2 + pv_s3) / 3)
-
-            # change settings.py path values
+            # change config.json path values
             data = {"PATH_VALUE": path_value}
 
             with open('config.json', 'w') as jsonfile:

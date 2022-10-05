@@ -25,7 +25,6 @@ class LineFollower:
         self.wall_value = wall_value
         self.accepted_deviance = accepted_deviance
         self.turn_angle = turn_angle
-        #self.drive_speed = drive_speed
         self.shut_down = False
         self.last_turn_direction = 1
         self.last_autocorrect_time = 0
@@ -84,10 +83,6 @@ class LineFollower:
                 break
             else:
                 self.FollowPath(DRIVE_SPEED)
-                
-        
-            
-                
 
 class Calibration:
     def __init__(self, ev3: EV3Brick, robot: DriveBase, line_sensor: ColorSensor, lf: LineFollower) -> None:
@@ -99,9 +94,7 @@ class Calibration:
 
     def run(self) -> None:
         while not self.calibrated:
-            
             self.robot.turn(-15)
-            
 
             # First sample measurement
             pv_s1 = self.line_sensor.reflection()
@@ -116,18 +109,15 @@ class Calibration:
             self.ev3.screen.print(self.line_sensor.reflection())
             wait(50)
 
-            # Move sensor to unique position
+            # Move sensor to first position
             self.robot.turn(-15)
             self.ev3.screen.print(self.line_sensor.reflection())
 
-            # Third sample measurement
-            #pv_s3 = self.line_sensor.reflection()
-
+            # Calculate average value between samples
             path_value = int((pv_s1 + pv_s2) / 2)
             wait(50)
-        
 
-            # change settings.py path values
+            # change config.json path values
             data = {"PATH_VALUE": path_value, "GREY_VALUE": pv_s1}
 
             with open('config.json', 'w') as jsonfile:

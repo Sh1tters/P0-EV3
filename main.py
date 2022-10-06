@@ -140,6 +140,11 @@ robot.turn(65)
 robot.straight(-120)
 
 for n in range(6):
+    """
+    Everytime a statement is true, then we break out of the current
+    loop index position, and into a new index position. At last it will
+    have hit the third path and be out of the for loop.
+    """
     robot.drive(100, 0)
     while True:
         if n % 2 == 0 and lf.isOffPath():
@@ -170,6 +175,11 @@ lf.run(50)
 robot.straight(100)
 
 for n in range(6):
+    """
+    Everytime a statement is true, then we break out of the current
+    loop index position, and into a new index position. At last it will
+    have hit the third path and be out of the for loop.
+    """
     robot.drive(100, 0)
     while True:
         if n % 2 == 0 and lf.isOffPath():

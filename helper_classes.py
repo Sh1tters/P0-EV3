@@ -18,14 +18,6 @@ class LineFollower:
         self.ev3 = ev3
         self.line_sensor = line_sensor
         self.path_value = 0
-        self.shut_down = False
-        self.last_turn_direction = 1
-        self.last_autocorrect_time = 0
-        self.autocorrect_timeframe = 1
-        self.comulative_turn_size = 10
-        self.comulative_turn = 0
-        self.last_decay_time = 0
-        self.decay_timeframe = .5
     
     def isOnPath(self) -> bool:
         """isOnPath Check if robot is on path
@@ -56,22 +48,22 @@ class LineFollower:
         """autocorrectPath Autocorrect to the path
         """        
         while not self.isOnWall():
+            # Calculate the deviation
             deviation = self.path_value - self.line_sensor.reflection()
             proportional_gain = 2
+
+            # Calculate the turn rate
             turn_rate = proportional_gain * deviation * (DRIVE_SPEED/250)
 
             self.robot.drive(DRIVE_SPEED, int(turn_rate))
 
 
-    def run(self, DRIVE_SPEED, drive_time=None) -> None:
+    def run(self, DRIVE_SPEED) -> None:
         """run Run the Line Following
                 """
-        start_time = time.time()
-        debug_big_nums = (int(start_time) // 100) * 100
         # Run Loop
         while True:
-            self.ev3.screen.print(str(int(start_time)-debug_big_nums) + " " + str(int(time.time())-debug_big_nums) + " " + str(drive_time))     
-            if self.isOnWall() or (drive_time != None and time.time() - start_time >= drive_time):
+            if self.isOnWall() :
                 self.robot.stop()
                 break
             else:

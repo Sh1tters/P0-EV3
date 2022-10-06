@@ -27,8 +27,8 @@ lf = LineFollower(ev3, robot, line_sensor)
 
 # Make Calibration
 cal = Calibration(ev3, robot, line_sensor, lf)
-line_sensor_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=30)
-line_sensor_motor.run_time(-500, 800, wait=True)
+line_sensor_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=30) # Lift the sensor up
+line_sensor_motor.run_time(-500, 800, wait=True) # Lifts the sensor down
 cal.run()
 lf.run(250)
 
@@ -70,8 +70,6 @@ lf.run(300)
 # First, the robot has to make a left turn. The more precise we can make it,
 # the better, as we want the robot to face the bottle directly, when having
 # performed the turn. This is due to the touch sensor.
-
-# I have chosen to make a 45 degree turn, then have the robot drive 2 cm
 robot.turn(-60)
 robot.straight(20)
 
@@ -87,19 +85,19 @@ while True:
 
 robot.straight(80)
 while True:
-    if 121 < ultrasonic_sensor.distance() < 400:
+    if 121 < ultrasonic_sensor.distance() < 400: # Drives to the bottle until its distance is less than 12 cm
         robot.drive(50, 0)
-    elif ultrasonic_sensor.distance() <= 120:
+    elif ultrasonic_sensor.distance() <= 120: # The robot has reached the bottle at a distance of 12 cm
         robot.stop()
         break
     else:
-        robot.drive(0, -25) #40
+        robot.drive(0, -25) # The robot will spin until it finds the bottle
 
 robot.straight(88)
-claw_motor.run_time(1000, 1000, wait=True)
-claw_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=30)
+claw_motor.run_time(1000, 1000, wait=True) # Close slightly the claw
+claw_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=30) # Closes the remaining until it has stalled
 robot.straight(230)
-claw_motor.run_time(-1000, 1800, wait=True)
+claw_motor.run_time(-1000, 1800, wait=True) # Open the claw
 robot.straight(-200)
 robot.turn(130)
 robot.straight(100)

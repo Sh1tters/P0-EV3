@@ -97,6 +97,7 @@ robot.straight(88)
 claw_motor.run_time(1000, 1000, wait=True) # Close slightly the claw
 claw_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=30) # Closes the remaining until it has stalled
 robot.straight(230)
+robot.straight(-20)
 claw_motor.run_time(-1000, 1800, wait=True) # Open the claw
 robot.straight(-200)
 robot.turn(130)
@@ -116,13 +117,19 @@ robot.straight(180)
 robot.turn(90)
 lf.run(50)
 line_sensor_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=30)
-robot.straight(600)
+robot.stop()
+robot.settings(200,640,153,611)
+robot.straight(450)
+
 robot.stop()
 robot.settings(50,640,153,611)
-robot.straight(500)
+line_sensor_motor.run_time(-500, 800, wait=True)
+robot.straight(725)
+line_sensor_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=30)
+
 robot.stop()
 robot.settings(160,640,153,611)
-robot.straight(850)
+robot.straight(600)
 line_sensor_motor.run_time(-500, 800, wait=True)
 robot.turn(75)
 robot.straight(50)
@@ -192,7 +199,7 @@ for n in range(6):
 robot.stop()
 robot.straight(50)
 robot.turn(32)
-robot.straight(470)
+robot.straight(460)
 claw_motor.run_time(1000, 1000, wait=True)
 claw_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=40)
 robot.straight(-580)
@@ -220,14 +227,15 @@ while True:
         robot.drive(100, 0)
     else: break
 robot.stop()
-robot.turn(80)
-robot.straight(120)
-robot.turn(-50)
-robot.straight(210)
-robot.turn(-60)
+robot.turn(45)
+while True:
+    if ultrasonic_sensor.distance() > 120:
+        robot.drive(100, 0)
+    else: break
+robot.turn(-85)
+robot.straight(250)
+robot.turn(40)
 robot.straight(280)
-robot.turn(30)
-robot.straight(310)
 lf.run(100)
 
 # 12. wall around bottle
@@ -246,3 +254,4 @@ lf.run(200)
 # 13. wall runway
 robot.turn(11)
 robot.straight(1650)
+

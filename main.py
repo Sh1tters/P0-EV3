@@ -70,7 +70,7 @@ lf.run(300)
 # First, the robot has to make a left turn. The more precise we can make it,
 # the better, as we want the robot to face the bottle directly, when having
 # performed the turn. This is due to the touch sensor.
-robot.turn(-60)
+robot.turn(-65)
 robot.straight(20)
 
 robot.drive(80, 0)
@@ -124,7 +124,7 @@ robot.straight(450)
 robot.stop()
 robot.settings(50,640,153,611)
 line_sensor_motor.run_time(-500, 800, wait=True)
-robot.straight(725)
+robot.straight(700)
 line_sensor_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=30)
 
 robot.stop()
@@ -198,7 +198,7 @@ for n in range(6):
 
 robot.stop()
 robot.straight(50)
-robot.turn(32)
+robot.turn(31)
 robot.straight(460)
 claw_motor.run_time(1000, 1000, wait=True)
 claw_motor.run_until_stalled(1000, then=Stop.HOLD, duty_limit=40)
@@ -223,7 +223,7 @@ lf.run(175)
 
 # 11. wall maze/tunnel
 while True:
-    if ultrasonic_sensor.distance() > 120:
+    if ultrasonic_sensor.distance() > 130:
         robot.drive(100, 0)
     else: break
 robot.stop()
@@ -233,20 +233,21 @@ while True:
         robot.drive(100, 0)
     else: break
 robot.turn(-85)
-robot.straight(250)
+robot.straight(270)
 robot.turn(40)
 robot.straight(280)
 lf.run(100)
 
 # 12. wall around bottle
 robot.turn(-30)
-robot.straight(400)
+robot.straight(450)
 robot.turn(65)
 while True:
     if lf.isOffPath():
         robot.drive(200, 0)
     else: break
 
+robot.straight(30)
 robot.stop()
 robot.turn(-20)
 lf.run(200)
@@ -254,4 +255,5 @@ lf.run(200)
 # 13. wall runway
 robot.turn(11)
 robot.straight(1650)
+claw_motor.run_time(-1000, 1800, wait=True)
 

@@ -6,7 +6,7 @@ from pybricks.tools import wait
 import json
 
 class LineFollower:  
-    def __init__(self, ev3: EV3Brick, robot: DriveBase, line_sensor: ColorSensor, path_value: int, wall_value: int, accepted_deviance: int, turn_angle: int):
+    def __init__(self, ev3: EV3Brick, robot: DriveBase, line_sensor: ColorSensor):
         """__init__ Constructs the necessary variables and objects to build a line follower
 
         Args:
